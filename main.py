@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-from google.oauth2.credentials import Credentials
+from datetime import datetime, timedelta
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
@@ -22,7 +22,17 @@ def main():
 
     drive_service = build('drive', 'v3', credentials=delegated_credentials)
 
-    results = drive_service.files().list(q="sharedWithMe=true", fields="files(id, name, webViewLink)").execute()
+    # 時間指定
+    # UTCによる時間を算出する
+    # https://developers.google.com/drive/api/guides/search-files?hl=ja#examples
+    date_by = datetime.utcnow() - timedelta(hours=24)
+    format_date = date_by.strftime('%Y-%m-%dT%H:%M:%S')
+
+    # Queryの生成
+    # Example 24時間以内のjpegまたpngのファイルを取得する
+    query = f"sharedWithMe=true and modifiedTime > '{format_date}' and (mimeType='image/jpeg' or mimeType='image/png' or mimeType='image/gif')"
+
+    results = drive_service.files().list(q=query, fields="files(id, name, webViewLink)").execute()
     items = results.get('files', [])
 
     if not items:
