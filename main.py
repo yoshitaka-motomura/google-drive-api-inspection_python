@@ -41,6 +41,7 @@ def main():
         print('Shared files:')
         for item in items:
             print(f"ID: {item['id']}, Name: {item['name']}, Link: {item['webViewLink']}")
+            # TODO: ファイルを取得する場合は item['webViewLink']の値を使って取得する？
 
 
 if __name__ == '__main__':
